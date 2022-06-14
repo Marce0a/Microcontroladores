@@ -21,21 +21,21 @@ NUEVE:		.byte	1
 			.def	C_DMIN=r18				;Contador de decenas de minuto.
 			.def	C_UHRS=r19				;Contador de unidades de hora.
 			.def	C_DHRS=r20				;Contador de decenas de hora.
-			.def	C_CONV=r21				;Contador para rutina de conversiÛn.
-			.def	S_CONV=r22				;CombinaciÛn de 7 segmentos para dÌgito.
+			.def	C_CONV=r21				;Contador para rutina de conversi√≥n.
+			.def	S_CONV=r22				;Combinaci√≥n de 7 segmentos para d√≠gito.
 
-;CODE SEGMENT (inicio de cÛdigo ejecutable)
+;CODE SEGMENT (inicio de c√≥digo ejecutable)
 			.cseg
 INICIO:		jmp		RESET					;Vector de Reset.
-			jmp		EXT_INT0				;Vector de interrupciÛn externa 0.
-			jmp		EXT_INT1				;Vector de interrupciÛn externa 1.
+			jmp		EXT_INT0				;Vector de interrupci√≥n externa 0.
+			jmp		EXT_INT1				;Vector de interrupci√≥n externa 1.
 
 ;---------------------INICIO DEL PROGRAMA AL ENCENDIDO O NIVEL BAJO EN RESET---------------------------------------
 
 RESET:		rcall	TABLA_SEG
 			rcall	CONFIG_PORT				;Rutina para configurar I/O ports.
 			rcall	INICIA_CONT				;Rutina para iniciar contador.
-			rcall	INICIA_INT1				;Rutina para configurar interrupciÛn externa 1.
+			rcall	INICIA_INT1				;Rutina para configurar interrupci√≥n externa 1.
 			sei								;Global Interrupt Enable.
 LAZO:		rcall	DISPLAY					;Muestra valor en el display.
 			rjmp	LAZO
@@ -59,22 +59,22 @@ TABLA_SEG:	ldi		r16,0xFD
 			sts		OCHO,r16
 			ldi		r16,0xF7
 			sts		NUEVE,r16	;Fin de tabla
-EXT_INT0:	sbi		EIFR,INTF0				;Escribe un 1 en la bandera de interrupciÛn.
+EXT_INT0:	sbi		EIFR,INTF0				;Escribe un 1 en la bandera de interrupci√≥n.
 			reti
-EXT_INT1:	rcall	D_BTTN					;Retardo para estabilizar botÛn de entrada.
-			ldi		r28,0x01				;Bandera para saber sÌ es la primera vez.
+EXT_INT1:	rcall	D_BTTN					;Retardo para estabilizar bot√≥n de entrada.
+			ldi		r28,0x01				;Bandera para saber s√≠ es la primera vez.
 CONTEO_INT:	rcall	CONTEO_I				;Incrementa contador.
-			cpi		r28,0x00				;øEs la primera vez?
+			cpi		r28,0x00				;¬øEs la primera vez?
 			breq	FAST_INC
 			rjmp	NORMAL_INC
-FAST_INC:	ldi		r29,0x25				;Retardo para incremento r·pido (0.4 seg)
+FAST_INC:	ldi		r29,0x25				;Retardo para incremento r√°pido (0.4 seg)
 			rjmp	AUNES_0
 NORMAL_INC:	ldi		r29,0xA6				;Retardo para incremento regular (2 seg)
 			rjmp	AUNES_0
-AUNES_0:	sbis	PIND,3					;øYa se soltÛ el botÛn?
-			rjmp	AUNES_0_2				;NO->Contin˙a en interrupciÛn.
-			rcall	D_BTTN					;SÌ->Retardo para estabilizar botÛn de entrada.
-			sbi		EIFR,INTF1				;Borra bandera, evita regreso a interrupciÛn debido a rebote.
+AUNES_0:	sbis	PIND,3					;¬øYa se solt√≥ el bot√≥n?
+			rjmp	AUNES_0_2				;NO->Contin√∫a en interrupci√≥n.
+			rcall	D_BTTN					;S√≠->Retardo para estabilizar bot√≥n de entrada.
+			sbi		EIFR,INTF1				;Borra bandera, evita regreso a interrupci√≥n debido a rebote.
 			reti
 AUNES_0_2:	clr		r28						;Cambia bandera de primera vez.
 			rcall	DISPLAY
@@ -83,9 +83,9 @@ AUNES_0_2:	clr		r28						;Cambia bandera de primera vez.
 			rjmp	CONTEO_INT
 
 INICIA_INT1:ldi		r16,0x08				;X X X X ISC11 ISC10 ISC01 ISC00
-			sts		EICRA,r16				;0 0 0 0   1     0     X     X		Sensa transiciÛn negativa en INT1.
+			sts		EICRA,r16				;0 0 0 0   1     0     X     X		Sensa transici√≥n negativa en INT1.
 			sbi		EIMSK,INT1				;X X X X X X INT1 INT0
-			ret								;0 0 0 0 0 0  1    0				Habilita interrupciÛn INT1.
+			ret								;0 0 0 0 0 0  1    0				Habilita interrupci√≥n INT1.
 CONFIG_PORT:
 			ldi		r16,0xFF
 			out		DDRB,r16				;Configura Puerto B como salida.
@@ -147,18 +147,18 @@ DISPLAY:	clr		r23
 			rcall	D_DISP
 			cbi		PORTD,7
 			ret
-CONV_7SEG:	ldi		r26,0x00				;Rutina que busca en tabla el valor de 7 segmentos para cada dÌgito.
+CONV_7SEG:	ldi		r26,0x00				;Rutina que busca en tabla el valor de 7 segmentos para cada d√≠gito.
 			ldi		r27,0x01
 			add		r26,C_CONV
 			ld		S_CONV,X
 			ret
 ;RETARDOS
-D_BTTN:		ldi		r25,0x32				;Retardo para estabilizar botÛn de entrada en interrupciÛn (0x32).
+D_BTTN:		ldi		r25,0x32				;Retardo para estabilizar bot√≥n de entrada en interrupci√≥n (0x32).
 D_25ms:		rcall	D_0_5ms
 			dec		r25
 			brne	D_25ms
 			ret
-D_DISP:		ldi		r25,0x06				;Tiempo de encendido de cada dÌgito en el barrido (0x06).
+D_DISP:		ldi		r25,0x06				;Tiempo de encendido de cada d√≠gito en el barrido (0x06).
 D_03ms:		rcall	D_0_5ms
 			dec		r25
 			brne	D_03ms
