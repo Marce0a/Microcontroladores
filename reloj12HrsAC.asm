@@ -2,11 +2,10 @@
 ; Display_7_seg_Reloj_12_H.asm
 ;
 ; Created: 26/04/2022 07:30:47 a. m.
-; Author : Melanie-Sofia
 ;
-;Display multidÌgito de 7 segmentos (CA) para crear un reloj en formato de 12 Hrs.
+;Display multid√≠gito de 7 segmentos (√Ånodo Com√∫n) para crear un reloj en formato de 12 Hrs.
 ;
-;-------------------DATA SEGMENT (declaraciÛn de variables)-------------------------------------------------
+;-------------------DATA SEGMENT (declaraci√≥n de variables)-------------------------------------------------
 			.dseg							
 			.org	0x100
 CERO:		.byte	1
@@ -23,9 +22,9 @@ NUEVE:		.byte	1
 			.def	C_DMIN=r18				;Contador de decenas de minuto.
 			.def	C_UHRS=r19				;Contador de unidades de hora.
 			.def	C_DHRS=r20				;Contador de decenas de hora.
-			.def	C_CONV=r21				;Almacena conteo para rutina de conversiÛn.
-			.def	S_CONV=r22				;CombinaciÛn de 7 segmentos para dÌgito.
-;-------------------CODE SEGMENT (inicio de cÛdigo ejecutable)-----------------------------------------------
+			.def	C_CONV=r21				;Almacena conteo para rutina de conversi√≥n.
+			.def	S_CONV=r22				;Combinaci√≥n de 7 segmentos para d√≠gito.
+;-------------------CODE SEGMENT (inicio de c√≥digo ejecutable)-----------------------------------------------
 			.cseg
 PRINCIPAL:	ldi		r16,0x00
 			out		DDRC,r16				;Programa Port C como entrada.
@@ -35,7 +34,7 @@ PRINCIPAL:	ldi		r16,0x00
 			out		DDRB,r16				;Programa Port B como salida.
 			ldi		r16,0x7F
 			out		PORTC,r16				;Activa las resistencias de Pull Up.
-;----------CreaciÛn de tabla---------------------------------------------------------------------------------
+;----------Creaci√≥n de tabla---------------------------------------------------------------------------------
 			ldi		r16,0xFD				
 			sts		CERO,r16
 			ldi		r16,0x61
@@ -64,7 +63,7 @@ INICIO:		clr		C_UMIN
 			rjmp	LAZO_RELOJ
 PARO:		rcall	SHOW
 			rjmp	LAZO_IN
-;-------------------CÛdigo para funcionamiento del reloj-----------------------------------------------------
+;-------------------C√≥digo para funcionamiento del reloj-----------------------------------------------------
 INICIO_DH:	clr		C_UMIN					;Regresa a 0 unidades de minuto.
 			clr		C_DMIN					;Regresa a 0 decenas de minuto.
 			clr		C_UHRS					;Regresa a 0 unidades de hora.
@@ -77,27 +76,27 @@ INICIO_UH:	clr		C_UMIN					;Regresa a 0 unidades de minuto.
 			brne	INICIO_UH2				;*** Condiciones para saber si 
 			cpi		C_UHRS,0x02				;*** ya son las 12:00 y reiniciar.
 			breq	INICIO					;*
-INICIO_UH2:	cpi		r19,0x0A				;øYa se completarÛn 10 hrs?
+INICIO_UH2:	cpi		r19,0x0A				;¬øYa se completar√≥n 10 hrs?
 			breq	INICIO_DH				;Salta a rutina de decenas de hora.
 			rjmp	LAZO_RELOJ
 INICIO_DM:	clr		C_UMIN					;Regresa a 0 unidades de minuto.
 			inc		C_DMIN					;Incrementa valor de las decenas de minuto.
-			cpi		r18,0x06				;øYa se completaron 60 min?
+			cpi		r18,0x06				;¬øYa se completaron 60 min?
 			breq	INICIO_UH				;Salta a rutina de unidades de hora.
 			rjmp	LAZO_RELOJ
 LAZO_RELOJ:	ldi		r25,0x53				;Valor para crear retardo y poder visualizar la hora (0x53)
 SHOW_2:		rcall	SHOW
 			dec		r25
 LAZO_IN:	in		r16,PINC				;Lee el edo de los interruptores.
-			andi	r16,0x30				;Aplica m·scara al puerto de entrada.
-			cpi		r16,0x30				;øRESET-> OFF	PARO-> OFF?
-			breq	L_RELOJ_2				;Si ning˙n bÛtÛn est· activo, va a la subrutina LAZO_RELOJ.
-			cpi		r16,0x20				;øRESET-> OFF	PARO-> ON?
-			breq	PARO					;Si est· activo el botÛn de paro, va a la subrutina PARO.
-			cpi		r16,0x10				;øRESET-> ON	PARO-> OFF?
-			breq	INICIO					;Si est· activo el botÛn de reset, va a la subrutina INICIO.
-			cpi		r16,0x00				;øRESET-> ON	PARO-> ON?
-			breq	INICIO					;Si ambos botones est·n activos, va a la subrutina INICIO.
+			andi	r16,0x30				;Aplica m√°scara al puerto de entrada.
+			cpi		r16,0x30				;¬øRESET-> OFF	PARO-> OFF?
+			breq	L_RELOJ_2				;Si ning√∫n b√≥t√≥n est√° activo, va a la subrutina LAZO_RELOJ.
+			cpi		r16,0x20				;¬øRESET-> OFF	PARO-> ON?
+			breq	PARO					;Si est√° activo el bot√≥n de paro, va a la subrutina PARO.
+			cpi		r16,0x10				;¬øRESET-> ON	PARO-> OFF?
+			breq	INICIO					;Si est√° activo el bot√≥n de reset, va a la subrutina INICIO.
+			cpi		r16,0x00				;¬øRESET-> ON	PARO-> ON?
+			breq	INICIO					;Si ambos botones est√°n activos, va a la subrutina INICIO.
 L_RELOJ_2:	cpi		r25,0x00
 			brne	SHOW_2
 L_RELOJ_4:	inc		C_UMIN					;Incrementa valor de las unidades de minuto.
@@ -131,12 +130,12 @@ SHOW:		ldi		r23,0x3C
 			rcall	DELAY
 			cbi		PORTD,4
 			ret
-CONV_7SEG:	ldi		r26,0x00				;Rutina que busca en tabla valor de 7 segmentos para cada dÌgito.
+CONV_7SEG:	ldi		r26,0x00				;Rutina que busca en tabla valor de 7 segmentos para cada d√≠gito.
 			ldi		r27,0x01
 			add		r26,C_CONV
 			ld		S_CONV,X
 			ret
-DELAY:		ldi		r31,0x06				;Retardo entre encendido de cada dÌgito en el barrido (0x06)-(0xA6)
+DELAY:		ldi		r31,0x06				;Retardo entre encendido de cada d√≠gito en el barrido (0x06)-(0xA6)
 D_3_ms:		ldi		r30,0xA6
 D_0_5_ms:	dec		r30
 			brne	D_0_5_ms
