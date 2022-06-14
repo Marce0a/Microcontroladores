@@ -4,7 +4,7 @@
 ; Created: 29/04/2022 07:26:47 p. m.
 ; Author : marce
 ;
-
+; Display multidígito de 7 segmentos (Cátodo Común) para un reloj en formato de 12 Hrs.
 ;-------------------Declarar variables--------------------------------------------------------------------
 			.dseg							
 			.org	0x100
@@ -22,7 +22,7 @@ NUEVE:		.byte	1
 			.def	DC_MIN=r22
 			.def	UN_HRS=r23
 			.def	DC_HRS=r24
-;-------------------Inicio de c�digo------------------------------------------------------------------------
+;-------------------Inicio de código------------------------------------------------------------------------
 			.cseg
 PRINCIPAL:	ldi		r16,0x3C
 			out		DDRD,r16				;Configura entradas y salidas del Port D como salida.
@@ -30,7 +30,7 @@ PRINCIPAL:	ldi		r16,0x3C
 			out		DDRB,r16				;Programa Port B como salida.
 			ldi		r16,0x7F
 			out		PORTC,r16				;Activa las resistencias de Pull Up.
-;----------Creaci�n de tabla---------------------------------------------------------------------------------
+;----------Creación de tabla---------------------------------------------------------------------------------
 			ldi		r16,0xFD				
 			sts		CERO,r16
 			ldi		r16,0x61
@@ -57,7 +57,7 @@ INICIO:		clr		r17
 			clr		r19
 			clr		r20
 			rjmp	LAZO_RELOJ
-;-------------------C�digo del reloj------------------------------------------------------------------------------------
+;-------------------Código del reloj------------------------------------------------------------------------------------
 INICIO_DH:	clr		r17						;Regresa a 0 un de min.
 			clr		r18						;Regresa a 0 dec de min.
 			clr		r19						;Regresa a 0 un de hr.
@@ -144,7 +144,7 @@ SHOW:		rcall	UM_7SEG					;Rutina para hacer 1 ciclo de barrido.
 			out		PORTD,r29
 			ret
 
-DELAY:		ldi		r31,0x0A					;Retardo entre encendido de cada d�gito en el barrido (0x0A)-(0xA6)
+DELAY:		ldi		r31,0x0A					;Retardo entre encendido de cada dígito en el barrido (0x0A)-(0xA6)
 Del5_ms:	ldi		r30,0xA6
 Del0_5_ms:	dec		r30
 			brne	Del0_5_ms
