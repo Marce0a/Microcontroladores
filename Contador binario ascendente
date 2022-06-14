@@ -1,0 +1,27 @@
+inicio:
+		ldi		r16,0xFF
+		out		DDRB,r16	;Programa Puerto B como salida
+		clr		r15
+		out		DDRD,r15	;Programa Puerto D como entrada
+
+		out		PORTD,r16	;Habilita las 8 resistencias Pull UP de Puerto D
+
+lazo:	
+    inc		r16
+		out		PORTB,r16
+		rcall	Delay
+		rjmp	lazo
+Delay:
+		ldi		r19,0x0A	;Carga el valor 0A al regstro 19
+D1s:	
+    ldi		r20,0xC8	;Carga el valor C8 al registro 20
+D0_1s:
+    ldi		r21,0xA6	;Carga el valor C8 al registro 21
+D0_5ms:	
+    dec		r21				;Decrementa el registro 21
+    brne	D0_5ms		;Repite hasta llegar a 0
+		dec		r20				;Decrementa el registro 20
+		brne	D0_1s			;Repite hasta llegar a 0
+		dec		r19				;Decrementa el registro 19
+		brne	D1s				;Repite hasta llegar a 0
+		ret					  	;Termina Delay y continúa con rutina
